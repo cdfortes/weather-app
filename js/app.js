@@ -9,44 +9,20 @@ const timeIconContainer = document.querySelector('[data-js="time-icon"]')
 
 let timeImg = document.querySelector('[data-js="time"]')
 
-const getCityWeather = async (cityName) => {
-  const [{ Key, LocalizedName }] = await getCityData(cityName)
-  const [{ WeatherText, Temperature, IsDayTime, WeatherIcon }] =
-    await getCityWeatherData(Key)
-
-  return {
-    LocalizedName,
-    WeatherText,
-    Temperature,
-    IsDayTime,
-    WeatherIcon,
-  }
-}
 
 const showCityCard = () => cityCard.classList.remove('d-none')
 
-const changeImgDayOrNight = (IsDayTime) =>
-  IsDayTime
-    ? (timeImg.src = './src/day.svg')
-    : (timeImg.src = './src/night.svg')
-
 const insertWeatherDataInDOM = async (cityName) => {
-  const cityWeather = await getCityWeather(cityName)
+  const [{ Key, LocalizedName }] = await getCityData(cityName)
+  const [{ WeatherText, Temperature, IsDayTime, WeatherIcon }] =
+    await getCityWeatherData(Key)
+  const templateTimeIcon = `<img src="./src/icons/${WeatherIcon}.svg" alt="weather-icon"/>`
 
-  if (cityWeather) {
-    const { LocalizedName, WeatherText, Temperature, IsDayTime, WeatherIcon } =
-      cityWeather
-    const templateTimeIcon = `<img src="./src/icons/${WeatherIcon}.svg" alt="weather-icon"/>`
-
-    changeImgDayOrNight(IsDayTime)
-    timeIconContainer.innerHTML = templateTimeIcon
-    cityNameContainer.textContent = LocalizedName
-    cityWeatherContainer.textContent = WeatherText
-    cityTemperatureContainer.textContent = Temperature.Metric.Value
-    showCityCard()
-  }
-
-  cityForm.reset()
+  timeImg.src = IsDayTime ? './src/day.svg' : './src/night.svg'
+  timeIconContainer.innerHTML = templateTimeIcon
+  cityNameContainer.textContent = LocalizedName
+  cityWeatherContainer.textContent = WeatherText
+  cityTemperatureContainer.textContent = Temperature.Metric.Value
 }
 
 cityForm.addEventListener('submit', (event) => {
@@ -54,4 +30,6 @@ cityForm.addEventListener('submit', (event) => {
   const cityName = event.target.city.value
 
   insertWeatherDataInDOM(cityName)
+  showCityCard()
+  cityForm.reset()
 })
